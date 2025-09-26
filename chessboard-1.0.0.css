@@ -1,0 +1,90 @@
+/*! Apple-style theme for chessboard.js v1.0.0 (safe overrides) */
+
+/* layout clear */
+.clearfix-7da63 { clear: both; }
+
+/* board container — set width only; chessboard.js calculates square size */
+.board-b72b1 {
+  width: 320px;                     /* change this to scale the board */
+  border: 2px solid #e0e0e0;
+  box-sizing: content-box;          /* IMPORTANT: keep content-box for chessboard.js math */
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  overflow: hidden;
+  background: transparent;
+}
+
+/* squares */
+.square-55d63 {
+  float: left;
+  position: relative;
+
+  /* disable selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  /* let chessboard.js set exact width/height inline */
+  transition: background 0.18s ease;
+}
+
+/* apple-style light/dark squares */
+.white-1e1d7 { background-color: #f9f9f9; color: #333333; }
+.black-3c85d { background-color: #333333; color: #ffffff; }
+
+/* piece images (chessboard.js uses .piece-417db) */
+/* also include img inside board in case pieces are plain <img> */
+.piece-417db,
+.board-b72b1 img {
+  width: 85%;
+  height: 85%;
+  object-fit: contain;
+  cursor: grab;
+  pointer-events: auto;          /* allow drag */
+  -webkit-user-drag: none;       /* prevent native dragging on Safari */
+  user-drag: none;
+}
+
+.piece-417db:active,
+.board-b72b1 img:active { cursor: grabbing; }
+
+/* chessboard.js highlight classes — override to Apple-blue glow */
+.highlight1-32417,
+.highlight2-9c5d2 {
+  box-shadow: inset 0 0 6px 3px rgba(0,122,255,0.6);
+  border-radius: 6px;
+}
+
+/* optional custom drag-over class (if you use it in your code) */
+.square-55d63.drag-over {
+  outline: 3px dashed #007AFF;
+  background-color: rgba(0,122,255,0.12);
+}
+
+/* notation (file/rank letters/numbers) */
+.notation-322f9 {
+  cursor: default;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  color: #888;
+  position: absolute;
+  pointer-events: none;
+}
+
+.alpha-d2270 { bottom: 1px; right: 3px; }
+.numeric-fc462 { top: 2px; left: 2px; }
+
+/* responsive: scale the board on small screens */
+@media (max-width: 480px) {
+  .board-b72b1 { width: 90vw; max-width: 360px; }
+}
+/* Hide notation (letters/numbers on board edges) */
+.notation-322f9,
+.alpha-d2270,
+.numeric-fc462 {
+  display: none !important;
+}
+
