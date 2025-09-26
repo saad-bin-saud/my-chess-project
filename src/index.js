@@ -1,7 +1,7 @@
 // Import dependencies
 import $ from 'jquery';
 import { Chess } from 'chess.js';
-import Chessboard from '@chrisoakman/chessboardjs';
+import Chessboard from '@chrisoakman/chessboardjs/dist/chessboard-1.0.0.min.js';
 import '@chrisoakman/chessboardjs/dist/chessboard-1.0.0.min.css';
 
 // Initialize a new chess game
