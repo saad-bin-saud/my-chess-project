@@ -5,9 +5,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "chess.js": "^1.4.0",
     "@chrisoakman/chessboardjs": "^1.0.0",
-    "jquery": "^3.6.0"
+    "chess.js": "^1.4.0",
+    "jquery": "^3.7.1"
   },
   "devDependencies": {
     "css-loader": "^3.6.0",
