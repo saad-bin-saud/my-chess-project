@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chessboard.js + Chess.js Demo</title>
+
+  <!-- jQuery --> 
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Chessboard.js cSS -->
+  <link rel="stylesheet" href="chessboard-1.0.0.css"/>
+  <style>
+    #board { width: 400px; }
+    body { 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      height: 100vh; 
+      margin: 0;
+      background: #f5f5f5;
+    }
+  </style>
+</head>
+<body>
+  <div id="board"></div>
+
+  <script type="module">
+    import { Chess } from 'chess.js'
+  </script>
+
+  <!-- Scripts -->
+  <script src="chessboard-1.0.0.min.js"></script>
+  <!-- Chess.js (logic) -->
+  <script src="index.js"></script>
+
+  <script>
+    // create a chess game
+    const game = new Chess();
+
+    // board + rules connected
+    var board = Chessboard('board', {
+      draggable: true,
+      position: 'start',
+      pieceTheme: 'images/{piece}.png',
+
+      onDrop: function (source, target) {
+        console.log("Trying move:", source, "→", target);
+
+        // attempt move in chess.js
+        let move = game.move({
+          from: source,
+          to: target,
+          promotion: 'q' // always promote to queen for demo
+        });
+
+        // if illegal, snap back
+        if (move === null) {
+          console.log("Illegal move!");
+          return 'snapback';
+        }
+      },
+
+      onSnapEnd: function () {
+        // sync board with game state
+        board.position(game.fen());
+      }
+    });
+  </script>
+</body>
+</html>
