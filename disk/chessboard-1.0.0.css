@@ -45,7 +45,7 @@
   cursor: grab;
   pointer-events: auto;          /* allow drag */
   -webkit-user-drag: none;       /* prevent native dragging on Safari */
-  user-drag: none;
+  
 }
 
 .piece-417db:active,
