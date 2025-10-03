@@ -13,6 +13,7 @@
     "vite": "^7.1.8"
   },
   "scripts": {
+    "dev": "vite",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
