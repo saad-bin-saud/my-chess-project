@@ -14,8 +14,8 @@ window.addEventListener('DOMContentLoaded', () => {
   const board = Chessboard('board', {
     draggable: true,
     position: 'start',
-    pieceTheme:
-      'image/{piece}.png',
+    pieceTheme: 'image/{piece}.png',
+    width: 400,
 
     onDrop: function (source, target) {
       console.log('Trying move:', source, '→', target);
