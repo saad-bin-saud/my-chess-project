@@ -1,5 +1,4 @@
 // Import dependencies
-import $ from 'jquery';
 import { Chess } from 'chess.js';
 import Chessboard from '@chrisoakman/chessboardjs/dist/chessboard-1.0.0.min.js';
 import '@chrisoakman/chessboardjs/dist/chessboard-1.0.0.min.css';
@@ -7,9 +6,8 @@ import '@chrisoakman/chessboardjs/dist/chessboard-1.0.0.min.css';
 // Initialize a new chess game
 const game = new Chess();
 
-// Wait until DOM is ready
-$(document).ready(function () {
-  // Initialize the board inside #board element
+// Wait until DOM is ready (vanilla JS for Vite compatibility)
+window.addEventListener('DOMContentLoaded', () => {
   const board = Chessboard('board', {
     draggable: true,
     position: 'start',
