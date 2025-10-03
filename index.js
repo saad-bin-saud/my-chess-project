@@ -1,4 +1,8 @@
 // Import dependencies
+import $ from 'jquery';
+window.$ = $;
+window.jQuery = $;
+
 import { Chess } from 'chess.js';
 import './chessboard-1.0.0.min.js';
 import './chessboard-1.0.0.css';
