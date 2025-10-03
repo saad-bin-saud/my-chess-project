@@ -1,7 +1,7 @@
 // Import dependencies
 import { Chess } from 'chess.js';
-import Chessboard from '@chrisoakman/chessboardjs/dist/chessboard-1.0.0.min.js';
-import '@chrisoakman/chessboardjs/dist/chessboard-1.0.0.min.css';
+import './chessboard-1.0.0.min.js';
+import './chessboard-1.0.0.css';
 
 // Initialize a new chess game
 const game = new Chess();
@@ -12,7 +12,7 @@ window.addEventListener('DOMContentLoaded', () => {
     draggable: true,
     position: 'start',
     pieceTheme:
-      'https://unpkg.com/@chrisoakman/chessboardjs/img/chesspieces/wikipedia/{piece}.png',
+      'image/{piece}.png',
 
     onDrop: function (source, target) {
       console.log('Trying move:', source, '→', target);
