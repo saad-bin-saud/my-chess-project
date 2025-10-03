@@ -2,10 +2,9 @@
 import $ from 'jquery';
 window.$ = $;
 window.jQuery = $;
-
-import { Chess } from 'chess.js';
 import './chessboard-1.0.0.min.js';
 import './chessboard-1.0.0.css';
+import { Chess } from 'chess.js';
 
 // Initialize a new chess game
 const game = new Chess();
