@@ -104,3 +104,37 @@ window.addEventListener('DOMContentLoaded', () => {
     window.chessGame = game;
   }
 });
+// Track last move and highlight the previous move squares
+var lastMove = null;
+
+function removeLastMoveHighlight() {
+  $('#board .square-55d63').removeClass('highlight-previous');
+}
+
+function highlightLastMove(move) {
+  removeLastMoveHighlight();
+  if (!move) return;
+  $('#board .square-' + move.from).addClass('highlight-previous');
+  $('#board .square-' + move.to).addClass('highlight-previous');
+}
+
+// Enhance onDrop: when a move is made successfully, store it and highlight
+// Note: onDrop already calls game.move and returns 'snapback' on illegal move.
+// We'll update highlight after successful moves in onSnapEnd which syncs the board.
+var originalOnDrop = config.onDrop;
+config.onDrop = function (source, target) {
+  var move = game.move({ from: source, to: target, promotion: 'q' });
+  if (move === null) {
+    return 'snapback';
+  }
+  // store last move (use UCI style fields)
+  lastMove = { from: move.from, to: move.to };
+  return undefined;
+};
+
+var originalOnSnapEnd = config.onSnapEnd;
+config.onSnapEnd = function () {
+  // let the board sync first
+  if (typeof originalOnSnapEnd === 'function') originalOnSnapEnd();
+  highlightLastMove(lastMove);
+};
