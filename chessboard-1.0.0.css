@@ -64,6 +64,13 @@
   background-color: rgba(0,122,255,0.12);
 }
 
+/* Hover indicators (used for possible moves) */
+.hover-light { box-shadow: inset 0 0 6px 3px rgba(0,122,255,0.12); border-radius:6px; }
+.hover-dark { box-shadow: inset 0 0 6px 3px rgba(0,122,255,0.08); border-radius:6px; }
+
+/* tapped/selected square for touch devices */
+.selected { outline: 3px solid rgba(0,122,255,0.6); border-radius:6px; }
+
 /* Demo highlight colors for random-move example */
 .highlight-previous { box-shadow: inset 0 0 6px 3px rgba(0,122,255,0.45); border-radius:6px; }
 /* Capture highlight (enemy piece taken) */
