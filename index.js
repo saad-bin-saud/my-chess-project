@@ -1,59 +1,107 @@
-import $ from 'jquery';
-window.$ = $;
-window.jQuery = $;
 import './chessboard-1.0.0.css';
 import { Chess } from 'chess.js';
 
-const game = new Chess();
+// NOTE: adapted example integrating chess.js + chessboard.js
+var board = null;
+var game = new Chess();
+var whiteSquareGrey = '#a9a9a9';
+var blackSquareGrey = '#696969';
 
-function initBoard() {
-  const board = window.Chessboard('board', {
-    draggable: true,
-    position: game.fen(),
-    pieceTheme: 'image/{piece}.png',
-    width: 400,
-    onDragStart(source, piece) {
-      console.log('onDragStart', { source, piece, turn: game.turn() });
-      // Prevent dragging opponent pieces or dragging after game over
-      if (!piece) return false;
-      const turn = game.turn();
-      if ((turn === 'w' && piece.charAt(0) === 'b') || (turn === 'b' && piece.charAt(0) === 'w')) {
-        console.log('blocked drag: wrong color');
-        return false;
-      }
-      if (game.game_over()) {
-        console.log('blocked drag: game over');
-        return false;
-      }
-      return true;
-    },
-    onDrop(source, target) {
-      console.log('onDrop', { source, target });
-      const move = game.move({ from: source, to: target, promotion: 'q' });
-      console.log('move result', move);
-      if (move === null) {
-        console.log('snapback (illegal)');
-        return 'snapback';
-      }
-    },
-    onSnapEnd() {
-      console.log('onSnapEnd syncing board to', game.fen());
-      board.position(game.fen());
-    },
-  });
-  window.chessBoard = board;
-  window.chessGame = game;
+function removeGreySquares() {
+  // using #board as the container id
+  $('#board .square-55d63').css('background', '');
 }
+
+function greySquare(square) {
+  var $square = $('#board .square-' + square);
+
+  var background = whiteSquareGrey;
+  if ($square.hasClass('black-3c85d')) {
+    background = blackSquareGrey;
+  }
+
+  $square.css('background', background);
+}
+
+function isGameOver() {
+  if (typeof game.game_over === 'function') return game.game_over();
+  if (typeof game.is_game_over === 'function') return game.is_game_over();
+  if (typeof game.isGameOver === 'function') return game.isGameOver();
+  return false;
+}
+
+function onDragStart(source, piece) {
+  // do not pick up pieces if the game is over
+  if (isGameOver()) return false;
+
+  // or if it's not that side's turn
+  if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+      (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+    return false;
+  }
+}
+
+function onDrop(source, target) {
+  removeGreySquares();
+
+  // see if the move is legal
+  var move = game.move({
+    from: source,
+    to: target,
+    promotion: 'q' // always promote to a queen for simplicity
+  });
+
+  // illegal move
+  if (move === null) return 'snapback';
+}
+
+function onMouseoverSquare(square, piece) {
+  // get list of possible moves for this square
+  var moves = game.moves({ square: square, verbose: true });
+
+  // exit if there are no moves available for this square
+  if (!moves || moves.length === 0) return;
+
+  // highlight the square they moused over
+  greySquare(square);
+
+  // highlight the possible squares for this piece
+  for (var i = 0; i < moves.length; i++) {
+    greySquare(moves[i].to);
+  }
+}
+
+function onMouseoutSquare(square, piece) {
+  removeGreySquares();
+}
+
+function onSnapEnd() {
+  board.position(game.fen());
+}
+
+var config = {
+  draggable: true,
+  position: 'start',
+  pieceTheme: '/image/{piece}.png',
+  width: 400,
+  onDragStart: onDragStart,
+  onDrop: onDrop,
+  onMouseoutSquare: onMouseoutSquare,
+  onMouseoverSquare: onMouseoverSquare,
+  onSnapEnd: onSnapEnd
+};
 
 window.addEventListener('DOMContentLoaded', () => {
   if (typeof window.Chessboard === 'undefined') {
     const s = document.createElement('script');
     s.src = '/chessboard-1.0.0.min.js';
     s.async = false;
-    s.onload = initBoard;
+    s.onload = () => { board = Chessboard('board', config); window.chessBoard = board; window.chessGame = game; };
     s.onerror = () => console.error('Failed to load chessboard script');
     document.head.appendChild(s);
   } else {
-    initBoard();
+    board = Chessboard('board', config);
+    window.chessBoard = board;
+    window.chessGame = game;
   }
 });

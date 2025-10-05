@@ -4,7 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>My Chess Project</title>
-  <!-- Vite will handle JS and CSS imports -->
+  <!-- Load jQuery and chessboard assets so non-ESM chessboard sees global jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <link rel="stylesheet" href="/chessboard-1.0.0.css">
+  <script src="/chessboard-1.0.0.min.js"></script>
   <style>
     body {
       display: flex;
