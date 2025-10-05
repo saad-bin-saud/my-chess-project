@@ -9,7 +9,7 @@ var blackSquareGrey = '#696969';
 
 function removeGreySquares() {
   // Remove any highlight/drag classes instead of inline styles
-  $('#board .square-55d63').removeClass('highlight1-32417 highlight2-9c5d2 drag-over');
+  $('#board .square-55d63').removeClass('highlight1-32417 highlight2-9c5d2 drag-over highlight-capture');
 }
 
 function greySquare(square) {
@@ -66,7 +66,12 @@ function onMouseoverSquare(square, piece) {
 
   // highlight the possible squares for this piece
   for (var i = 0; i < moves.length; i++) {
-    greySquare(moves[i].to);
+    // if this move captures an enemy piece, show capture highlight color
+    if (moves[i].captured) {
+      $('#board .square-' + moves[i].to).addClass('highlight-capture');
+    } else {
+      greySquare(moves[i].to);
+    }
   }
 }
 
@@ -106,17 +111,48 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 // Track last move and highlight the previous move squares
 var lastMove = null;
+// When a capture happens, keep the capture highlight active until the opponent moves
+var captureHighlightActive = false;
+var captureHolder = null; // 'w' or 'b'
+// Track last move per color (so white and black highlights persist independently)
+var lastWhiteMove = null;
+var lastBlackMove = null;
 
 function removeLastMoveHighlight() {
-  $('#board .square-55d63').removeClass('highlight-previous highlight-capture');
+  $('#board .square-55d63').removeClass('highlight-previous highlight-capture highlight-white highlight-black');
 }
 
-function highlightLastMove(move) {
+function highlightLastMove() {
+  // Reapply stored per-color last moves so highlights persist after snap
+  // Clear any generic previous highlights first
   removeLastMoveHighlight();
+  if (lastWhiteMove) applyHighlight(lastWhiteMove, 'white');
+  if (lastBlackMove) applyHighlight(lastBlackMove, 'black');
+}
+
+function removeHighlights(color) {
+  // Remove highlights for a specific color (white or black)
+  if (color === 'white') {
+    $('#board .square-55d63').removeClass('highlight-white');
+    // also remove capture highlights that were set by white
+    $('#board .square-55d63').filter(function () { return $(this).data('highlight-by') === 'white'; }).removeClass('highlight-capture').removeData('highlight-by');
+  } else if (color === 'black') {
+    $('#board .square-55d63').removeClass('highlight-black');
+    $('#board .square-55d63').filter(function () { return $(this).data('highlight-by') === 'black'; }).removeClass('highlight-capture').removeData('highlight-by');
+  }
+}
+
+function applyHighlight(move, color) {
   if (!move) return;
-  var cls = move.captured ? 'highlight-capture' : 'highlight-previous';
-  $('#board .square-' + move.from).addClass(cls);
-  $('#board .square-' + move.to).addClass(cls);
+  if (move.captured) {
+    // mark capture highlight and remember which side set it
+    $('#board .square-' + move.from).addClass('highlight-capture').data('highlight-by', color);
+    $('#board .square-' + move.to).addClass('highlight-capture').data('highlight-by', color);
+  } else {
+    var cls = color === 'white' ? 'highlight-white' : 'highlight-black';
+    $('#board .square-' + move.from).addClass(cls);
+    $('#board .square-' + move.to).addClass(cls);
+  }
 }
 
 // Enhance onDrop: when a move is made successfully, store it and highlight
@@ -127,8 +163,30 @@ config.onDrop = function (source, target) {
   if (move === null) {
     return 'snapback';
   }
+  // if there is an active capture highlight from a previous capture,
+  // clear it only when the opposite side has just moved
+  if (captureHighlightActive && move.color !== captureHolder) {
+    removeLastMoveHighlight();
+    captureHighlightActive = false;
+    captureHolder = null;
+  }
+
   // store last move with capture info
   lastMove = { from: move.from, to: move.to, captured: Boolean(move.captured) };
+  if (move.color === 'w') {
+    // remove white's previous highlights then apply new
+    removeHighlights('white');
+    lastWhiteMove = lastMove;
+    applyHighlight(lastWhiteMove, 'white');
+  } else {
+    removeHighlights('black');
+    lastBlackMove = lastMove;
+    applyHighlight(lastBlackMove, 'black');
+  }
+  if (move.captured) {
+    captureHighlightActive = true;
+    captureHolder = move.color; // the side that performed the capture
+  }
   return undefined;
 };
 
@@ -136,5 +194,5 @@ var originalOnSnapEnd = config.onSnapEnd;
 config.onSnapEnd = function () {
   // let the board sync first
   if (typeof originalOnSnapEnd === 'function') originalOnSnapEnd();
-  highlightLastMove(lastMove);
+  highlightLastMove();
 };
