@@ -108,18 +108,18 @@ window.addEventListener('DOMContentLoaded', () => {
 var lastMove = null;
 
 function removeLastMoveHighlight() {
-  $('#board .square-55d63').removeClass('highlight-previous');
+  $('#board .square-55d63').removeClass('highlight-previous highlight-capture');
 }
 
 function highlightLastMove(move) {
   removeLastMoveHighlight();
   if (!move) return;
-  $('#board .square-' + move.from).addClass('highlight-previous');
-  $('#board .square-' + move.to).addClass('highlight-previous');
+  var cls = move.captured ? 'highlight-capture' : 'highlight-previous';
+  $('#board .square-' + move.from).addClass(cls);
+  $('#board .square-' + move.to).addClass(cls);
 }
 
 // Enhance onDrop: when a move is made successfully, store it and highlight
-// Note: onDrop already calls game.move and returns 'snapback' on illegal move.
 // We'll update highlight after successful moves in onSnapEnd which syncs the board.
 var originalOnDrop = config.onDrop;
 config.onDrop = function (source, target) {
@@ -127,8 +127,8 @@ config.onDrop = function (source, target) {
   if (move === null) {
     return 'snapback';
   }
-  // store last move (use UCI style fields)
-  lastMove = { from: move.from, to: move.to };
+  // store last move with capture info
+  lastMove = { from: move.from, to: move.to, captured: Boolean(move.captured) };
   return undefined;
 };
 
