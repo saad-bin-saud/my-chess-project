@@ -8,19 +8,18 @@ var whiteSquareGrey = '#a9a9a9';
 var blackSquareGrey = '#696969';
 
 function removeGreySquares() {
-  // using #board as the container id
-  $('#board .square-55d63').css('background', '');
+  // Remove any highlight/drag classes instead of inline styles
+  $('#board .square-55d63').removeClass('highlight1-32417 highlight2-9c5d2 drag-over');
 }
 
 function greySquare(square) {
   var $square = $('#board .square-' + square);
-
-  var background = whiteSquareGrey;
+  // Use the CSS highlight classes defined in chessboard-1.0.0.css
   if ($square.hasClass('black-3c85d')) {
-    background = blackSquareGrey;
+    $square.addClass('highlight2-9c5d2');
+  } else {
+    $square.addClass('highlight1-32417');
   }
-
-  $square.css('background', background);
 }
 
 function isGameOver() {
