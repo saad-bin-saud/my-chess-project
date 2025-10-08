@@ -1,16 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react'
-import io from 'socket.io-client'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { Chess } from 'chess.js'
+import { Chessboard } from 'react-chessboard'
+import io from 'socket.io-client'
 
 export default function ChessBoardComponent() {
-  const boardRef = useRef(null)
   const socketRef = useRef(null)
   const [fen, setFen] = useState('start')
   const [roomId] = useState('room1')
   const chessRef = useRef(new Chess())
+  const [promotion, setPromotion] = useState(null)
 
   useEffect(() => {
-    // init socket
     socketRef.current = io('http://localhost:3000')
     socketRef.current.on('connect', () => console.log('connected to server'))
     socketRef.current.emit('join', roomId)
@@ -30,19 +30,69 @@ export default function ChessBoardComponent() {
     return () => socketRef.current.disconnect()
   }, [roomId])
 
-  // simple click move from/to using prompt (temporary UI)
-  function makeMove() {
-    const from = prompt('from (e.g. e2)')
-    const to = prompt('to (e.g. e4)')
-    if (!from || !to) return
-    socketRef.current.emit('move', { roomId, from, to })
-  }
+  // Called when a piece is dropped on a square (drag or click-to-move)
+  const onPieceDrop = useCallback((sourceSquare, targetSquare) => {
+    // detect pawn promotion situation
+    const piece = chessRef.current.get(sourceSquare)
+    const isPawn = piece && piece.type === 'p'
+    const targetRank = targetSquare[1]
+    if (isPawn && ((piece.color === 'w' && targetRank === '8') || (piece.color === 'b' && targetRank === '1'))) {
+      // show promotion picker and don't perform the move until choice
+      setPromotion({ from: sourceSquare, to: targetSquare, color: piece.color })
+      return false
+    }
+
+    // Normal move (no promotion) - try locally and emit to server
+    return sendMove(sourceSquare, targetSquare)
+  }, [roomId])
+
+  // sendMove returns true if move applied locally
+  const sendMove = useCallback((from, to, promotionChoice) => {
+    const movePayload = promotionChoice ? { from, to, promotion: promotionChoice } : { from, to }
+    const move = chessRef.current.move(movePayload)
+    if (move === null) {
+      return false
+    }
+    setFen(chessRef.current.fen())
+    if (socketRef.current && socketRef.current.connected) {
+      socketRef.current.emit('move', { roomId, ...movePayload })
+    }
+    return true
+  }, [roomId])
 
   return (
     <div>
-      <div id="board" ref={boardRef} style={{ width: 400 }} />
+      <div style={{ width: 480, margin: '0 auto' }}>
+        <Chessboard position={fen} onPieceDrop={onPieceDrop} boardWidth={480} />
+      </div>
+      {promotion && (
+        <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: 'rgba(0,0,0,0.6)', padding: 20, borderRadius: 8 }}>
+            <div style={{ color: '#fff', marginBottom: 8 }}>Choose promotion:</div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {['q', 'r', 'b', 'n'].map((p) => (
+                <button
+                  key={p}
+                  onClick={() => {
+                    sendMove(promotion.from, promotion.to, p)
+                    setPromotion(null)
+                  }}
+                  style={{ padding: '8px 12px', fontSize: 16 }}
+                >
+                  {p.toUpperCase()}
+                </button>
+              ))}
+              <button
+                onClick={() => setPromotion(null)}
+                style={{ padding: '8px 12px', fontSize: 16, background: '#444', color: '#fff' }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div style={{ marginTop: 12, textAlign: 'center' }}>
-        <button onClick={makeMove}>Make move (prompt)</button>
         <div style={{ marginTop: 8 }}>FEN: {fen}</div>
       </div>
     </div>
