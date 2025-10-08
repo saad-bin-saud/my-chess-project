@@ -9,6 +9,8 @@ export default function ChessBoardComponent() {
   const [roomId] = useState('room1')
   const chessRef = useRef(new Chess())
   const [promotion, setPromotion] = useState(null)
+  const [lastMove, setLastMove] = useState(null)
+  const [currentTurn, setCurrentTurn] = useState('w')
 
   useEffect(() => {
     socketRef.current = io('http://localhost:3000')
@@ -18,12 +20,15 @@ export default function ChessBoardComponent() {
       if (data && data.fen) {
         chessRef.current.load(data.fen)
         setFen(data.fen)
+        setCurrentTurn(chessRef.current.turn())
       }
     })
     socketRef.current.on('move_result', (data) => {
       if (data && data.ok && data.fen) {
         chessRef.current.load(data.fen)
         setFen(data.fen)
+        setCurrentTurn(chessRef.current.turn())
+        if (data.move) setLastMove({ from: data.move.from, to: data.move.to })
       }
     })
 
@@ -62,8 +67,31 @@ export default function ChessBoardComponent() {
 
   return (
     <div>
-      <div style={{ width: 480, margin: '0 auto' }}>
-        <Chessboard position={fen} onPieceDrop={onPieceDrop} boardWidth={480} />
+      <div style={{ width: 480, margin: '0 auto', textAlign: 'center' }}>
+        <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center', gap: 12, alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 12, height: 12, borderRadius: 12, background: '#fff', border: currentTurn === 'w' ? '3px solid #4CAF50' : '1px solid #888' }} />
+            <div style={{ fontSize: 14 }}>White</div>
+          </div>
+          <div style={{ fontSize: 14, color: '#666' }}>to move</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ fontSize: 14 }}>Black</div>
+            <div style={{ width: 12, height: 12, borderRadius: 12, background: '#000', border: currentTurn === 'b' ? '3px solid #4CAF50' : '1px solid #888' }} />
+          </div>
+        </div>
+        <Chessboard
+          position={fen}
+          onPieceDrop={onPieceDrop}
+          boardWidth={480}
+          customSquareStyles={(() => {
+            const styles = {}
+            if (lastMove) {
+              styles[lastMove.from] = { background: 'rgba(255,149,0,0.6)' }
+              styles[lastMove.to] = { background: 'rgba(255,149,0,0.9)' }
+            }
+            return styles
+          })()}
+        />
       </div>
       {promotion && (
         <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
