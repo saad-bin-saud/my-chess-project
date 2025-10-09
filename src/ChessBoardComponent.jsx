@@ -104,6 +104,22 @@ export default function ChessBoardComponent() {
     return true
   }, [roomId])
 
+  // custom pieces using public/image assets
+  const customPieces = {
+    wK: () => <img src="/image/wK.png" alt="wK" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
+    wQ: () => <img src="/image/wQ.png" alt="wQ" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
+    wR: () => <img src="/image/wR.png" alt="wR" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
+    wB: () => <img src="/image/wB.png" alt="wB" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
+    wN: () => <img src="/image/wN.png" alt="wN" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
+    wP: () => <img src="/image/wP.png" alt="wP" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
+    bK: () => <img src="/image/bK.png" alt="bK" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
+    bQ: () => <img src="/image/bQ.png" alt="bQ" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
+    bR: () => <img src="/image/bR.png" alt="bR" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
+    bB: () => <img src="/image/bB.png" alt="bB" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
+    bN: () => <img src="/image/bN.png" alt="bN" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
+    bP: () => <img src="/image/bP.png" alt="bP" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
+  }
+
   return (
     <div>
       <div style={{ width: 480, margin: '0 auto', textAlign: 'center' }}>
@@ -121,6 +137,7 @@ export default function ChessBoardComponent() {
         <Chessboard
           position={fen}
           onPieceDrop={onPieceDrop}
+          customPieces={customPieces}
           onSquareClick={(sq) => {
             // toggle select
             if (selectedSquare === sq) {
