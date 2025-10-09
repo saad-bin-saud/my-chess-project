@@ -51,33 +51,40 @@
 .piece-417db:active,
 .board-b72b1 img:active { cursor: grabbing; }
 
-/* chessboard.js highlight classes — override to Apple-blue glow */
+/* chessboard.js highlight classes — Apple-style blue glow */
 .highlight1-32417,
 .highlight2-9c5d2 {
-  box-shadow: inset 0 0 6px 3px rgba(0,122,255,0.6);
-  border-radius: 6px;
+  box-shadow: inset 0 0 8px 3px rgba(0,122,255,0.6);
+  border-radius: 8px;
 }
 
 /* optional custom drag-over class (if you use it in your code) */
 .square-55d63.drag-over {
-  outline: 3px dashed #007AFF;
-  background-color: rgba(0,122,255,0.12);
+  outline: 3px dashed rgba(0,122,255,0.45);
+  background-color: rgba(0,122,255,0.08);
+  border-radius: 8px;
 }
 
 /* Hover indicators (used for possible moves) */
-.hover-light { box-shadow: inset 0 0 6px 3px rgba(0,122,255,0.12); border-radius:6px; }
-.hover-dark { box-shadow: inset 0 0 6px 3px rgba(0,122,255,0.08); border-radius:6px; }
+.hover-light { box-shadow: inset 0 0 8px 3px rgba(0,122,255,0.16); border-radius:8px; }
+.hover-dark { box-shadow: inset 0 0 6px 3px rgba(0,122,255,0.08); border-radius:8px; }
 
 /* tapped/selected square for touch devices */
-.selected { outline: 3px solid rgba(0,122,255,0.6); border-radius:6px; }
+.selected { outline: 3px solid rgba(0,122,255,0.6); border-radius:8px; }
 
 /* Demo highlight colors for random-move example */
-.highlight-previous { box-shadow: inset 0 0 6px 3px rgba(0,122,255,0.45); border-radius:6px; }
+/* previous-move highlight (soft blue) */
+.highlight-previous { box-shadow: inset 0 0 8px 3px rgba(0,122,255,0.45); border-radius:8px; }
 /* Capture highlight (enemy piece taken) */
-.highlight-capture { box-shadow: inset 0 0 6px 3px #ff9500; border-radius:6px; }
+/* capture highlight (orange) */
+.highlight-capture { box-shadow: inset 0 0 8px 3px #ff9500; border-radius:8px; }
 /* per-color previous move highlights (chess.com style) */
-.highlight-white { box-shadow: inset 0 0 6px 3px rgba(0,122,255,0.45); border-radius:6px; }
-.highlight-black { box-shadow: inset 0 0 6px 3px rgba(0,122,255,0.45); border-radius:6px; }
+.highlight-white { box-shadow: inset 0 0 8px 3px rgba(0,122,255,0.45); border-radius:8px; }
+.highlight-black { box-shadow: inset 0 0 8px 3px rgba(0,122,255,0.45); border-radius:8px; }
+
+/* Directional highlight classes */
+.direction-origin { box-shadow: inset 0 0 0 3px rgba(0,122,255,0.6); border-radius:8px; }
+.direction-destination { box-shadow: inset 0 0 8px 3px rgba(0,122,255,0.6); border-radius:8px; background-color: rgba(0,122,255,0.06); }
 
 /* notation (file/rank letters/numbers) */
 .notation-322f9 {
