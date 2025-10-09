@@ -252,11 +252,13 @@ export default function ChessBoardComponent() {
                   // quiet move: small blue dot
                   styles[to] = {
                     ...styles[to],
-                    backgroundImage: 'radial-gradient(circle at 50% 45%, rgba(0,122,255,0.95) 20%, transparent 21%)',
+                    /* Apple-style soft dot: subtle white highlight center, strong blue core, soft fade and glow */
+                    backgroundImage: 'radial-gradient(circle at 50% 42%, rgba(255,255,255,0.95) 0%, rgba(0,122,255,0.98) 42%, rgba(0,122,255,0.7) 56%, rgba(0,122,255,0.0) 72%)',
                     backgroundRepeat: 'no-repeat',
-                    backgroundPosition: '50% 45%',
-                    backgroundSize: '16% 16%',
-                    borderRadius: '6px',
+                    backgroundPosition: '50% 42%',
+                    backgroundSize: '40% 40%',
+                    boxShadow: '0 6px 16px rgba(0,122,255,0.12)',
+                    borderRadius: '8px',
                   }
                 }
               })
