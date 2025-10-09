@@ -101,7 +101,10 @@ export default function ChessBoardComponent() {
     if (socketRef.current && socketRef.current.connected) {
       socketRef.current.emit('move', { roomId, ...movePayload })
     }
-    return true
+      // clear selection UI after sending
+      setSelectedSquare(null)
+      setLegalMoves([])
+      return true
   }, [roomId])
 
   // custom pieces using public/image assets
@@ -191,33 +194,71 @@ export default function ChessBoardComponent() {
           customLightSquareStyle={{ backgroundColor: '#fbfbfb' }}
           customDarkSquareStyle={{ backgroundColor: '#2f2f2f' }}
           onSquareClick={(sq) => {
-            // toggle select
+            // If a square is already selected and user tapped a destination, attempt move
+            if (selectedSquare && selectedSquare !== sq) {
+              const moveObj = legalMoves.find(m => m.to === sq)
+              if (moveObj) {
+                if (moveObj.promotion) {
+                  setPromotion({ from: selectedSquare, to: sq, color: chessRef.current.get(selectedSquare).color })
+                } else {
+                  sendMove(selectedSquare, sq)
+                }
+                setSelectedSquare(null)
+                setLegalMoves([])
+                return
+              }
+            }
+
+            // toggle selection
             if (selectedSquare === sq) {
               setSelectedSquare(null)
               setLegalMoves([])
               return
             }
+
+            // select this square and compute verbose legal moves
             setSelectedSquare(sq)
-            // compute legal moves from this square
             const moves = chessRef.current.moves({ square: sq, verbose: true }) || []
-            setLegalMoves(moves.map(m => m.to))
+            setLegalMoves(moves)
           }}
           boardWidth={480}
           customSquareStyles={(() => {
             const styles = {}
-            // last move highlight (keep previous orange style)
+            // last move highlight (orange)
             if (lastMove) {
-              styles[lastMove.from] = { background: 'rgba(255,149,0,0.6)' }
-              styles[lastMove.to] = { background: 'rgba(255,149,0,0.9)' }
+              styles[lastMove.from] = { boxShadow: 'inset 0 0 6px 3px rgba(255,149,0,0.6)', borderRadius: '6px' }
+              styles[lastMove.to] = { boxShadow: 'inset 0 0 6px 3px rgba(255,149,0,0.9)', borderRadius: '6px' }
             }
-            // if a square is selected, show arrow indicators for each legal move
+
+            // selected origin + legal moves indicators
             if (selectedSquare && legalMoves.length > 0) {
-              // highlight the origin
               styles[selectedSquare] = { boxShadow: 'inset 0 0 0 3px rgba(0,122,255,0.6)', borderRadius: '6px' }
-              // add arrow styles for each target
-              legalMoves.forEach(to => {
-                const arrowStyle = getArrowStyles(selectedSquare, to, 'rgba(0,122,255,0.6)')
-                if (arrowStyle) styles[to] = { ...styles[to], ...arrowStyle }
+              legalMoves.forEach(m => {
+                const to = m.to
+                if (!to) return
+                if (m.captured) {
+                  // capture: orange tint + small orange dot
+                  styles[to] = {
+                    ...styles[to],
+                    backgroundColor: 'rgba(255,149,0,0.12)',
+                    boxShadow: 'inset 0 0 6px 3px #ff9500',
+                    borderRadius: '6px',
+                    backgroundImage: 'radial-gradient(circle at 50% 45%, #ff9500 18%, transparent 19%)',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: '50% 45%',
+                    backgroundSize: '18% 18%'
+                  }
+                } else {
+                  // quiet move: small blue dot
+                  styles[to] = {
+                    ...styles[to],
+                    backgroundImage: 'radial-gradient(circle at 50% 45%, rgba(0,122,255,0.95) 20%, transparent 21%)',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: '50% 45%',
+                    backgroundSize: '16% 16%',
+                    borderRadius: '6px',
+                  }
+                }
               })
             }
             return styles
