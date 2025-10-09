@@ -271,22 +271,35 @@ export default function ChessBoardComponent() {
         <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: 'rgba(0,0,0,0.6)', padding: 20, borderRadius: 8 }}>
             <div style={{ color: '#fff', marginBottom: 8 }}>Choose promotion:</div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {['q', 'r', 'b', 'n'].map((p) => (
-                <button
-                  key={p}
-                  onClick={() => {
-                    sendMove(promotion.from, promotion.to, p)
-                    setPromotion(null)
-                  }}
-                  style={{ padding: '8px 12px', fontSize: 16 }}
-                >
-                  {p.toUpperCase()}
-                </button>
-              ))}
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              {['q', 'r', 'b', 'n'].map((p) => {
+                const colorPrefix = promotion && promotion.color === 'b' ? 'b' : 'w'
+                // map promotion letter to image file names: e.g. wQ.png, bN.png
+                const fileMap = { q: 'Q', r: 'R', b: 'B', n: 'N' }
+                const imgName = `${colorPrefix}${fileMap[p]}.png`
+                return (
+                  <button
+                    key={p}
+                    onClick={() => {
+                      sendMove(promotion.from, promotion.to, p)
+                      setPromotion(null)
+                    }}
+                    aria-label={`Promote to ${fileMap[p]}`}
+                    style={{
+                      padding: 6,
+                      background: 'transparent',
+                      border: 'none',
+                      borderRadius: 8,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <img src={`/image/${imgName}`} alt={fileMap[p]} style={{ width: 48, height: 48, objectFit: 'contain', display: 'block' }} />
+                  </button>
+                )
+              })}
               <button
                 onClick={() => setPromotion(null)}
-                style={{ padding: '8px 12px', fontSize: 16, background: '#444', color: '#fff' }}
+                style={{ padding: '8px 12px', fontSize: 16, background: '#444', color: '#fff', borderRadius: 8 }}
               >
                 Cancel
               </button>
