@@ -32,7 +32,9 @@ body {
 .rcw-square.dark { background-color: #2f2f2f; }
 
 /* piece styling */
-.rcw-piece img { filter: drop-shadow(0 6px 10px rgba(0,0,0,0.12)); }
+.rcw-piece img { filter: drop-shadow(0 6px 12px rgba(0,0,0,0.12)); }
+.rcw-piece { display: flex; align-items: center; justify-content: center; }
+.rcw-piece img { border-radius: 6px; }
 
 /* highlights */
 .rcw-selected { outline: 3px solid rgba(0,122,255,0.6); border-radius: 8px; }
