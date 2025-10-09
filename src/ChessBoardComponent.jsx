@@ -106,18 +106,18 @@ export default function ChessBoardComponent() {
 
   // custom pieces using public/image assets
   const customPieces = {
-    wK: () => <img src="/image/wK.png" alt="wK" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
-    wQ: () => <img src="/image/wQ.png" alt="wQ" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
-    wR: () => <img src="/image/wR.png" alt="wR" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
-    wB: () => <img src="/image/wB.png" alt="wB" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
-    wN: () => <img src="/image/wN.png" alt="wN" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
-    wP: () => <img src="/image/wP.png" alt="wP" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
-    bK: () => <img src="/image/bK.png" alt="bK" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
-    bQ: () => <img src="/image/bQ.png" alt="bQ" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
-    bR: () => <img src="/image/bR.png" alt="bR" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
-    bB: () => <img src="/image/bB.png" alt="bB" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
-    bN: () => <img src="/image/bN.png" alt="bN" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
-    bP: () => <img src="/image/bP.png" alt="bP" style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }} />,
+    wK: ({ squareWidth }) => <img src="/image/wK.png" alt="wK" draggable={false} style={{ width: Math.floor(squareWidth * 0.85), height: Math.floor(squareWidth * 0.85), objectFit: 'contain', pointerEvents: 'none' }} />,
+    wQ: ({ squareWidth }) => <img src="/image/wQ.png" alt="wQ" draggable={false} style={{ width: Math.floor(squareWidth * 0.85), height: Math.floor(squareWidth * 0.85), objectFit: 'contain', pointerEvents: 'none' }} />,
+    wR: ({ squareWidth }) => <img src="/image/wR.png" alt="wR" draggable={false} style={{ width: Math.floor(squareWidth * 0.85), height: Math.floor(squareWidth * 0.85), objectFit: 'contain', pointerEvents: 'none' }} />,
+    wB: ({ squareWidth }) => <img src="/image/wB.png" alt="wB" draggable={false} style={{ width: Math.floor(squareWidth * 0.85), height: Math.floor(squareWidth * 0.85), objectFit: 'contain', pointerEvents: 'none' }} />,
+    wN: ({ squareWidth }) => <img src="/image/wN.png" alt="wN" draggable={false} style={{ width: Math.floor(squareWidth * 0.85), height: Math.floor(squareWidth * 0.85), objectFit: 'contain', pointerEvents: 'none' }} />,
+    wP: ({ squareWidth }) => <img src="/image/wP.png" alt="wP" draggable={false} style={{ width: Math.floor(squareWidth * 0.85), height: Math.floor(squareWidth * 0.85), objectFit: 'contain', pointerEvents: 'none' }} />,
+    bK: ({ squareWidth }) => <img src="/image/bK.png" alt="bK" draggable={false} style={{ width: Math.floor(squareWidth * 0.85), height: Math.floor(squareWidth * 0.85), objectFit: 'contain', pointerEvents: 'none' }} />,
+    bQ: ({ squareWidth }) => <img src="/image/bQ.png" alt="bQ" draggable={false} style={{ width: Math.floor(squareWidth * 0.85), height: Math.floor(squareWidth * 0.85), objectFit: 'contain', pointerEvents: 'none' }} />,
+    bR: ({ squareWidth }) => <img src="/image/bR.png" alt="bR" draggable={false} style={{ width: Math.floor(squareWidth * 0.85), height: Math.floor(squareWidth * 0.85), objectFit: 'contain', pointerEvents: 'none' }} />,
+    bB: ({ squareWidth }) => <img src="/image/bB.png" alt="bB" draggable={false} style={{ width: Math.floor(squareWidth * 0.85), height: Math.floor(squareWidth * 0.85), objectFit: 'contain', pointerEvents: 'none' }} />,
+    bN: ({ squareWidth }) => <img src="/image/bN.png" alt="bN" draggable={false} style={{ width: Math.floor(squareWidth * 0.85), height: Math.floor(squareWidth * 0.85), objectFit: 'contain', pointerEvents: 'none' }} />,
+    bP: ({ squareWidth }) => <img src="/image/bP.png" alt="bP" draggable={false} style={{ width: Math.floor(squareWidth * 0.85), height: Math.floor(squareWidth * 0.85), objectFit: 'contain', pointerEvents: 'none' }} />,
   }
 
   return (
