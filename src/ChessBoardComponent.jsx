@@ -138,6 +138,9 @@ export default function ChessBoardComponent() {
           position={fen}
           onPieceDrop={onPieceDrop}
           customPieces={customPieces}
+          customBoardStyle={{ borderRadius: '16px', boxShadow: '0 10px 30px rgba(0,0,0,0.08)' }}
+          customLightSquareStyle={{ backgroundColor: '#fbfbfb' }}
+          customDarkSquareStyle={{ backgroundColor: '#2f2f2f' }}
           onSquareClick={(sq) => {
             // toggle select
             if (selectedSquare === sq) {
