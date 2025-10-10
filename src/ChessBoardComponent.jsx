@@ -335,12 +335,21 @@ export default function ChessBoardComponent() {
       {/* Fixed chat at bottom - centered behind the board and stretches to the top */}
       <div className="chat-fixed" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', top: 0, bottom: 0, width: boardWidth, maxWidth: '92vw', background: '#ffffff', boxShadow: '0 -8px 24px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', padding: 12, zIndex: 1 }}>
         <div style={{ fontWeight: 600, marginBottom: 8 }}>Room chat</div>
-        <div ref={messagesRef} style={{ flex: 1, overflowY: 'auto', padding: '6px 4px', display: 'flex', flexDirection: 'column-reverse', gap: 8 }}>
-          {chatMessages.length === 0 && <div style={{ color: '#888', fontSize: 13 }}>No messages yet</div>}
+        <div ref={messagesRef} style={{ flex: 1, overflowY: 'auto', padding: '10px 8px', display: 'flex', flexDirection: 'column-reverse', gap: 12, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial" }}>
+          {chatMessages.length === 0 && <div style={{ color: '#8e8e93', fontSize: 14 }}>No messages yet</div>}
           {[...chatMessages].slice().reverse().map((m, i) => (
-            <div key={i} style={{ alignSelf: m.from === 'Me' ? 'flex-end' : 'flex-start', maxWidth: '85%' }}>
-              <div style={{ fontSize: 12, color: '#666' }}>{m.from}</div>
-              <div style={{ background: m.from === 'Me' ? 'rgba(0,122,255,0.1)' : '#f2f2f2', padding: '8px 10px', borderRadius: 8 }}>{m.message}</div>
+            <div key={i} style={{ alignSelf: m.from === 'Me' ? 'flex-end' : 'flex-start', maxWidth: '85%', display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ fontSize: 12, color: '#6e6e73', marginBottom: 2 }}>{m.from}</div>
+              <div style={{
+                background: m.from === 'Me' ? 'linear-gradient(180deg,#007aff22,#007aff11)' : '#f5f5f7',
+                padding: '10px 14px',
+                borderRadius: 14,
+                boxShadow: m.from === 'Me' ? '0 6px 20px rgba(0,122,255,0.08)' : '0 6px 18px rgba(0,0,0,0.04)',
+                fontSize: 15,
+                color: '#111',
+                lineHeight: '1.25',
+                wordBreak: 'break-word'
+              }}>{m.message}</div>
             </div>
           ))}
         </div>
