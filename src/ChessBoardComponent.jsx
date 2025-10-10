@@ -38,6 +38,19 @@ export default function ChessBoardComponent() {
   const messagesRef = useRef(null)
   const CHAT_HEIGHT = 220
 
+  // responsive board width (max 520px, otherwise relative to viewport)
+  const calcWidth = () => {
+    if (typeof window === 'undefined') return 520
+    return Math.min(520, Math.floor(window.innerWidth * 0.92))
+  }
+  const [boardWidth, setBoardWidth] = useState(() => calcWidth())
+  useEffect(() => {
+    const onResize = () => setBoardWidth(calcWidth())
+    onResize()
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
   useEffect(() => {
     socketRef.current = io('http://localhost:3000')
     socketRef.current.on('connect', () => console.log('connected to server'))
@@ -110,7 +123,8 @@ export default function ChessBoardComponent() {
   // auto-scroll chat when messages change
   useEffect(() => {
     if (messagesRef.current) {
-      messagesRef.current.scrollTop = messagesRef.current.scrollHeight
+      // With column-reverse layout the visual bottom is the scrollTop 0
+      messagesRef.current.scrollTop = 0
     }
   }, [chatMessages])
 
@@ -179,8 +193,8 @@ export default function ChessBoardComponent() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', paddingBottom: CHAT_HEIGHT }}>
-      <div style={{ width: 520, marginTop: 24, position: 'relative', zIndex: 3 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh' }}>
+      <div style={{ width: boardWidth, maxWidth: '92vw', marginTop: 24, position: 'relative', zIndex: 3 }}>
         <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center', gap: 12, alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 12, height: 12, borderRadius: 12, background: '#fff', border: currentTurn === 'w' ? '3px solid #4CAF50' : '1px solid #888' }} />
@@ -223,7 +237,7 @@ export default function ChessBoardComponent() {
             const moves = chessRef.current.moves({ square: sq, verbose: true }) || []
             setLegalMoves(moves)
           }}
-          boardWidth={520}
+          boardWidth={boardWidth}
           customSquareStyles={(() => {
             const styles = {}
             if (lastMove) {
@@ -318,12 +332,12 @@ export default function ChessBoardComponent() {
         </div>
       )}
 
-      {/* Fixed chat at bottom - centered and behind the board */}
-      <div className="chat-fixed" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', bottom: 0, width: 520, height: CHAT_HEIGHT, background: '#ffffff', boxShadow: '0 -8px 24px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', padding: 12, zIndex: 1 }}>
+      {/* Fixed chat at bottom - centered behind the board and stretches to the top */}
+      <div className="chat-fixed" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', top: 0, bottom: 0, width: boardWidth, maxWidth: '92vw', background: '#ffffff', boxShadow: '0 -8px 24px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', padding: 12, zIndex: 1 }}>
         <div style={{ fontWeight: 600, marginBottom: 8 }}>Room chat</div>
-        <div ref={messagesRef} style={{ flex: 1, overflowY: 'auto', padding: '6px 4px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div ref={messagesRef} style={{ flex: 1, overflowY: 'auto', padding: '6px 4px', display: 'flex', flexDirection: 'column-reverse', gap: 8 }}>
           {chatMessages.length === 0 && <div style={{ color: '#888', fontSize: 13 }}>No messages yet</div>}
-          {chatMessages.map((m, i) => (
+          {[...chatMessages].slice().reverse().map((m, i) => (
             <div key={i} style={{ alignSelf: m.from === 'Me' ? 'flex-end' : 'flex-start', maxWidth: '85%' }}>
               <div style={{ fontSize: 12, color: '#666' }}>{m.from}</div>
               <div style={{ background: m.from === 'Me' ? 'rgba(0,122,255,0.1)' : '#f2f2f2', padding: '8px 10px', borderRadius: 8 }}>{m.message}</div>
