@@ -50,6 +50,9 @@ export default function ChessBoardComponent() {
   const [currentTurn, setCurrentTurn] = useState('w')
   const [selectedSquare, setSelectedSquare] = useState(null)
   const [legalMoves, setLegalMoves] = useState([])
+  // chat state
+  const [chatMessages, setChatMessages] = useState([])
+  const [chatInput, setChatInput] = useState('')
 
   useEffect(() => {
     socketRef.current = io('http://localhost:3000')
@@ -69,6 +72,10 @@ export default function ChessBoardComponent() {
         setCurrentTurn(chessRef.current.turn())
         if (data.move) setLastMove({ from: data.move.from, to: data.move.to })
       }
+    })
+    // chat listener
+    socketRef.current.on('chat', (msg) => {
+      setChatMessages((s) => [...s, msg])
     })
 
     return () => socketRef.current.disconnect()
@@ -172,9 +179,18 @@ export default function ChessBoardComponent() {
     },
   }
 
+  // send chat message
+  const sendChat = (e) => {
+    e && e.preventDefault()
+    if (!chatInput || !socketRef.current || !socketRef.current.connected) return
+    const payload = { roomId, from: 'Me', message: chatInput }
+    socketRef.current.emit('chat', payload)
+    setChatInput('')
+  }
+
   return (
-    <div>
-      <div style={{ width: 480, margin: '0 auto', textAlign: 'center' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', gap: 20 }}>
+      <div style={{ width: 480, textAlign: 'center' }}>
         <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center', gap: 12, alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 12, height: 12, borderRadius: 12, background: '#fff', border: currentTurn === 'w' ? '3px solid #4CAF50' : '1px solid #888' }} />
@@ -186,6 +202,7 @@ export default function ChessBoardComponent() {
             <div style={{ width: 12, height: 12, borderRadius: 12, background: '#000', border: currentTurn === 'b' ? '3px solid #4CAF50' : '1px solid #888' }} />
           </div>
         </div>
+
         <Chessboard
           position={fen}
           onPieceDrop={onPieceDrop}
@@ -267,6 +284,8 @@ export default function ChessBoardComponent() {
           })()}
         />
       </div>
+
+      {/* Promotion modal (modal overlays the whole screen) */}
       {promotion && (
         <div
           role="dialog"
@@ -320,7 +339,24 @@ export default function ChessBoardComponent() {
           </div>
         </div>
       )}
-      {/* FEN debug display removed */}
+
+      {/* Chat panel */}
+      <div style={{ width: 300, maxHeight: 560, display: 'flex', flexDirection: 'column', background: '#fff', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.06)', padding: 12 }}>
+        <div style={{ fontWeight: 600, marginBottom: 8 }}>Room chat</div>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '6px 4px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {chatMessages.length === 0 && <div style={{ color: '#888', fontSize: 13 }}>No messages yet</div>}
+          {chatMessages.map((m, i) => (
+            <div key={i} style={{ alignSelf: m.from === 'Me' ? 'flex-end' : 'flex-start', maxWidth: '85%' }}>
+              <div style={{ fontSize: 12, color: '#666' }}>{m.from}</div>
+              <div style={{ background: m.from === 'Me' ? 'rgba(0,122,255,0.1)' : '#f2f2f2', padding: '8px 10px', borderRadius: 8 }}>{m.message}</div>
+            </div>
+          ))}
+        </div>
+        <form onSubmit={sendChat} style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+          <input value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder="Type a message" style={{ flex: 1, padding: '8px 10px', borderRadius: 8, border: '1px solid #e6e6e6' }} />
+          <button type="submit" style={{ padding: '8px 12px', borderRadius: 8, background: '#007aff', color: '#fff', border: 'none' }}>Send</button>
+        </form>
+      </div>
     </div>
   )
 }

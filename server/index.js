@@ -39,6 +39,13 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Simple chat messages within a room
+  socket.on('chat', ({ roomId, from, message }) => {
+    if (!roomId || !message) return
+    const payload = { from: from || socket.id, message, ts: Date.now() }
+    io.to(roomId).emit('chat', payload)
+  })
+
   socket.on('disconnect', () => {
     console.log('socket disconnected', socket.id);
   });
