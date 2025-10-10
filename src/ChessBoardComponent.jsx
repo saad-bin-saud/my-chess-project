@@ -195,17 +195,6 @@ export default function ChessBoardComponent() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh' }}>
       <div style={{ width: boardWidth, maxWidth: '92vw', marginTop: 24, position: 'relative', zIndex: 3 }}>
-        <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center', gap: 12, alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 12, height: 12, borderRadius: 12, background: '#fff', border: currentTurn === 'w' ? '3px solid #4CAF50' : '1px solid #888' }} />
-            <div style={{ fontSize: 14 }}>White</div>
-          </div>
-          <div style={{ fontSize: 14, color: '#666' }}>to move</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ fontSize: 14 }}>Black</div>
-            <div style={{ width: 12, height: 12, borderRadius: 12, background: '#000', border: currentTurn === 'b' ? '3px solid #4CAF50' : '1px solid #888' }} />
-          </div>
-        </div>
 
         <Chessboard
           position={fen}
@@ -334,7 +323,6 @@ export default function ChessBoardComponent() {
 
       {/* Fixed chat at bottom - centered behind the board and stretches to the top */}
       <div className="chat-fixed" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', top: 0, bottom: 0, width: boardWidth, maxWidth: '92vw', background: '#ffffff', boxShadow: '0 -8px 24px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', padding: 12, zIndex: 1 }}>
-        <div style={{ fontWeight: 600, marginBottom: 8 }}>Room chat</div>
         <div ref={messagesRef} style={{ flex: 1, overflowY: 'auto', padding: '10px 8px', display: 'flex', flexDirection: 'column-reverse', gap: 12, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial" }}>
           {chatMessages.length === 0 && <div style={{ color: '#8e8e93', fontSize: 14 }}>No messages yet</div>}
           {[...chatMessages].slice().reverse().map((m, i) => (
