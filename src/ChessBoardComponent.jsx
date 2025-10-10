@@ -320,9 +320,7 @@ export default function ChessBoardComponent() {
           </div>
         </div>
       )}
-      <div style={{ marginTop: 12, textAlign: 'center' }}>
-        <div style={{ marginTop: 8 }}>FEN: {fen}</div>
-      </div>
+      {/* FEN debug display removed */}
     </div>
   )
 }
