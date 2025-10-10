@@ -341,10 +341,12 @@ export default function ChessBoardComponent() {
             </div>
           ))}
         </div>
-        <form onSubmit={sendChat} style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-          <input value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder="Type a message" style={{ flex: 1, padding: '8px 10px', borderRadius: 8, border: '1px solid #e6e6e6' }} />
-          <button type="submit" style={{ padding: '8px 12px', borderRadius: 8, background: '#007aff', color: '#fff', border: 'none' }}>Send</button>
-        </form>
+        <div style={{ position: 'sticky', bottom: 12, display: 'flex', gap: 8 }}>
+          <form onSubmit={sendChat} style={{ display: 'flex', gap: 8, width: '100%' }}>
+            <input value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder="Type a message" style={{ flex: 1, padding: '12px 14px', borderRadius: 12, border: '1px solid #e6e6e6', fontSize: 16 }} />
+            <button type="submit" style={{ padding: '12px 16px', borderRadius: 12, background: '#007aff', color: '#fff', border: 'none', fontSize: 16 }}>Send</button>
+          </form>
+        </div>
       </div>
     </div>
   )
