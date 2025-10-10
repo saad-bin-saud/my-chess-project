@@ -1,3 +1,111 @@
+:root{
+  --apple-blue: rgba(0,122,255,0.6);
+  --accent-orange: #ff9500;
+  --board-max-width: 520px;
+  --bg: #ffffff;
+  --muted: #8e8e93;
+  --text: #111;
+}
+
+/* Root layout */
+.app-root{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  min-height:100vh;
+}
+
+.app-board-wrap{
+  margin-top:24px;
+  position:relative;
+  z-index:3;
+}
+
+/* Board visuals kept via component props, but we add an apple-like container */
+.app-board {
+  border-radius:16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  background: var(--bg);
+}
+
+/* Promotion modal */
+.app-modal-overlay{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(0,0,0,0.35);
+  z-index:2147483647;
+}
+.app-modal{
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+  z-index:2147483648;
+  max-width: min(92vw, 420px);
+}
+.app-modal .title{ color: #111; margin-bottom:8px; font-weight:600 }
+.app-modal .promotion-row{ display:flex; gap:12px; align-items:center }
+.app-modal .promotion-btn{ padding:6px; background:transparent; border:none; border-radius:8px; cursor:pointer }
+.app-modal .cancel-btn{ padding:8px 12px; font-size:16px; background:#444; color:#fff; border-radius:8px }
+
+/* Chat panel (centered and responsive) */
+.app-chat-fixed{
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  top:0;
+  bottom:0;
+  background: var(--bg);
+  box-shadow: 0 -8px 24px rgba(0,0,0,0.06);
+  display:flex;
+  flex-direction:column;
+  padding:12px;
+  z-index:1; /* behind board */
+  max-height:100vh;
+}
+.app-chat-messages{
+  flex:1;
+  overflow:auto;
+  padding:10px 8px;
+  display:flex;
+  flex-direction:column-reverse;
+  gap:12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+.app-chat-empty{ color: var(--muted); font-size:14px }
+
+.app-message{ max-width:85%; display:flex; flex-direction:column; gap:6px }
+.app-message .meta{ font-size:12px; color:#6e6e73; margin-bottom:2px }
+.app-message .bubble{ padding:10px 14px; border-radius:14px; box-shadow:0 6px 18px rgba(0,0,0,0.04); font-size:15px; color:var(--text); line-height:1.25; word-break:break-word }
+.app-message--mine .bubble{ background: linear-gradient(180deg,#007aff22,#007aff11); box-shadow:0 6px 20px rgba(0,122,255,0.08) }
+.app-message--their .bubble{ background:#f5f5f7 }
+
+.app-chat-input-wrapper{ position:sticky; bottom:12px; display:flex; gap:8px }
+.app-chat-form{ display:flex; gap:8px; width:100% }
+.app-chat-input{ flex:1; padding:12px 14px; border-radius:12px; border:1px solid #e6e6e6; font-size:16px }
+.app-chat-send{ padding:12px 16px; border-radius:12px; background:#007aff; color:#fff; border:none; font-size:16px }
+
+/* Small screens tweaks */
+@media (max-width:420px){
+  .app-modal{ padding:14px }
+  .app-modal .promotion-row img{ width:48px; height:48px }
+  .app-chat-send, .app-chat-input{ font-size:15px }
+}
+
+/* Center board vertically and horizontally on small phones */
+@media (max-width:600px){
+  .app-root{
+    justify-content: center;
+  }
+  .app-board-wrap{
+    margin-top: 0;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
 /* Apple-inspired minimalist theme for the chessboard */
 html, body, #root {
 	height: 100%;

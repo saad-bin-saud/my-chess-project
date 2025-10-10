@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { Chess } from 'chess.js'
 import { Chessboard } from 'react-chessboard'
 import io from 'socket.io-client'
+import './style.css'
 
 // Small helpers
 function squareToCoords(square) {
@@ -193,8 +194,8 @@ export default function ChessBoardComponent() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh' }}>
-      <div style={{ width: boardWidth, maxWidth: '92vw', marginTop: 24, position: 'relative', zIndex: 3 }}>
+    <div className="app-root">
+      <div className="app-board-wrap" style={{ width: boardWidth, maxWidth: '92vw' }}>
 
         <Chessboard
           position={fen}
@@ -265,86 +266,45 @@ export default function ChessBoardComponent() {
             return styles
           })()}
         />
-      </div>
+  </div>
 
       {/* Promotion modal */}
       {promotion && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          style={{
-            position: 'fixed',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(0,0,0,0.35)',
-            zIndex: 2147483647,
-            pointerEvents: 'auto'
-          }}
-        >
-          <div style={{ background: '#ffffff', padding: 20, borderRadius: 12, boxShadow: '0 12px 30px rgba(0,0,0,0.18)', zIndex: 2147483648 }}>
-            <div style={{ color: '#111', marginBottom: 8, fontWeight: 600 }}>Choose promotion</div>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        <div className="app-modal-overlay" role="dialog" aria-modal="true">
+          <div className="app-modal">
+            <div className="title">Choose promotion</div>
+            <div className="promotion-row">
               {['q', 'r', 'b', 'n'].map((p) => {
                 const colorPrefix = promotion && promotion.color === 'b' ? 'b' : 'w'
                 const fileMap = { q: 'Q', r: 'R', b: 'B', n: 'N' }
                 const imgName = `${colorPrefix}${fileMap[p]}.png`
                 return (
-                  <button
-                    key={p}
-                    onClick={() => {
-                      sendMove(promotion.from, promotion.to, p)
-                      setPromotion(null)
-                    }}
-                    aria-label={`Promote to ${fileMap[p]}`}
-                    style={{
-                      padding: 6,
-                      background: 'transparent',
-                      border: 'none',
-                      borderRadius: 8,
-                      cursor: 'pointer'
-                    }}
-                  >
+                  <button key={p} onClick={() => { sendMove(promotion.from, promotion.to, p); setPromotion(null) }} aria-label={`Promote to ${fileMap[p]}`} className="promotion-btn">
                     <img src={`/image/${imgName}`} alt={fileMap[p]} style={{ width: 56, height: 56, objectFit: 'contain', display: 'block', background: 'transparent' }} />
                   </button>
                 )
               })}
-              <button
-                onClick={() => setPromotion(null)}
-                style={{ padding: '8px 12px', fontSize: 16, background: '#444', color: '#fff', borderRadius: 8 }}
-              >
-                Cancel
-              </button>
+              <button onClick={() => setPromotion(null)} className="cancel-btn">Cancel</button>
             </div>
           </div>
         </div>
       )}
 
       {/* Fixed chat at bottom - centered behind the board and stretches to the top */}
-      <div className="chat-fixed" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', top: 0, bottom: 0, width: boardWidth, maxWidth: '92vw', background: '#ffffff', boxShadow: '0 -8px 24px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', padding: 12, zIndex: 1 }}>
-        <div ref={messagesRef} style={{ flex: 1, overflowY: 'auto', padding: '10px 8px', display: 'flex', flexDirection: 'column-reverse', gap: 12, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial" }}>
-          {chatMessages.length === 0 && <div style={{ color: '#8e8e93', fontSize: 14 }}>No messages yet</div>}
+      <div className="app-chat-fixed" style={{ width: boardWidth, maxWidth: '92vw' }}>
+        <div className="app-chat-messages" ref={messagesRef}>
+          {chatMessages.length === 0 && <div className="app-chat-empty">No messages yet</div>}
           {[...chatMessages].slice().reverse().map((m, i) => (
-            <div key={i} style={{ alignSelf: m.from === 'Me' ? 'flex-end' : 'flex-start', maxWidth: '85%', display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <div style={{ fontSize: 12, color: '#6e6e73', marginBottom: 2 }}>{m.from}</div>
-              <div style={{
-                background: m.from === 'Me' ? 'linear-gradient(180deg,#007aff22,#007aff11)' : '#f5f5f7',
-                padding: '10px 14px',
-                borderRadius: 14,
-                boxShadow: m.from === 'Me' ? '0 6px 20px rgba(0,122,255,0.08)' : '0 6px 18px rgba(0,0,0,0.04)',
-                fontSize: 15,
-                color: '#111',
-                lineHeight: '1.25',
-                wordBreak: 'break-word'
-              }}>{m.message}</div>
+            <div key={i} className={`app-message ${m.from === 'Me' ? 'app-message--mine' : 'app-message--their'}`} style={{ alignSelf: m.from === 'Me' ? 'flex-end' : 'flex-start' }}>
+              <div className="meta">{m.from}</div>
+              <div className="bubble">{m.message}</div>
             </div>
           ))}
         </div>
-        <div style={{ position: 'sticky', bottom: 12, display: 'flex', gap: 8 }}>
-          <form onSubmit={sendChat} style={{ display: 'flex', gap: 8, width: '100%' }}>
-            <input value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder="Type a message" style={{ flex: 1, padding: '12px 14px', borderRadius: 12, border: '1px solid #e6e6e6', fontSize: 16 }} />
-            <button type="submit" style={{ padding: '12px 16px', borderRadius: 12, background: '#007aff', color: '#fff', border: 'none', fontSize: 16 }}>Send</button>
+        <div className="app-chat-input-wrapper">
+          <form onSubmit={sendChat} className="app-chat-form">
+            <input value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder="Type a message" className="app-chat-input" />
+            <button type="submit" className="app-chat-send">Send</button>
           </form>
         </div>
       </div>
