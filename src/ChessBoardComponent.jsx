@@ -180,7 +180,7 @@ export default function ChessBoardComponent() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', paddingBottom: CHAT_HEIGHT }}>
-      <div style={{ width: 520, marginTop: 24 }}>
+      <div style={{ width: 520, marginTop: 24, position: 'relative', zIndex: 3 }}>
         <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center', gap: 12, alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 12, height: 12, borderRadius: 12, background: '#fff', border: currentTurn === 'w' ? '3px solid #4CAF50' : '1px solid #888' }} />
@@ -318,8 +318,8 @@ export default function ChessBoardComponent() {
         </div>
       )}
 
-      {/* Fixed chat at bottom */}
-      <div className="chat-fixed" style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: CHAT_HEIGHT, background: '#ffffff', boxShadow: '0 -8px 24px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', padding: 12 }}>
+      {/* Fixed chat at bottom - centered and behind the board */}
+      <div className="chat-fixed" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', bottom: 0, width: 520, height: CHAT_HEIGHT, background: '#ffffff', boxShadow: '0 -8px 24px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', padding: 12, zIndex: 1 }}>
         <div style={{ fontWeight: 600, marginBottom: 8 }}>Room chat</div>
         <div ref={messagesRef} style={{ flex: 1, overflowY: 'auto', padding: '6px 4px', display: 'flex', flexDirection: 'column', gap: 8 }}>
           {chatMessages.length === 0 && <div style={{ color: '#888', fontSize: 13 }}>No messages yet</div>}
