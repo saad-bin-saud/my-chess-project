@@ -3,7 +3,7 @@ import { Chess } from 'chess.js'
 import { Chessboard } from 'react-chessboard'
 import io from 'socket.io-client'
 
-// Helpers for arrow highlights
+// Small helpers
 function squareToCoords(square) {
   if (!square || square.length !== 2) return null
   const file = square.charCodeAt(0) - 'a'.charCodeAt(0)
@@ -21,25 +21,6 @@ function arrowDataURL(angleDeg, color = 'rgba(0,122,255,0.6)') {
   return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`
 }
 
-function getArrowStyles(from, to, color = 'rgba(0,122,255,0.6)') {
-  if (!from || !to) return null
-  const f = squareToCoords(from)
-  const t = squareToCoords(to)
-  if (!f || !t) return null
-  const dx = t.file - f.file
-  const dy = t.rank - f.rank
-  const angleRad = Math.atan2(dy, dx)
-  const angleDeg = (angleRad * 180) / Math.PI
-  return {
-    backgroundImage: arrowDataURL(angleDeg, color),
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'center',
-    backgroundSize: '40% 40%',
-    backgroundColor: 'rgba(0,122,255,0.06)',
-    borderRadius: '6px',
-  }
-}
-
 export default function ChessBoardComponent() {
   const socketRef = useRef(null)
   const [fen, setFen] = useState('start')
@@ -50,9 +31,12 @@ export default function ChessBoardComponent() {
   const [currentTurn, setCurrentTurn] = useState('w')
   const [selectedSquare, setSelectedSquare] = useState(null)
   const [legalMoves, setLegalMoves] = useState([])
+
   // chat state
   const [chatMessages, setChatMessages] = useState([])
   const [chatInput, setChatInput] = useState('')
+  const messagesRef = useRef(null)
+  const CHAT_HEIGHT = 220
 
   useEffect(() => {
     socketRef.current = io('http://localhost:3000')
@@ -108,15 +92,30 @@ export default function ChessBoardComponent() {
     if (socketRef.current && socketRef.current.connected) {
       socketRef.current.emit('move', { roomId, ...movePayload })
     }
-      // clear selection UI after sending
-      setSelectedSquare(null)
-      setLegalMoves([])
-      return true
+    // clear selection UI after sending
+    setSelectedSquare(null)
+    setLegalMoves([])
+    return true
   }, [roomId])
+
+  // send chat message
+  const sendChat = (e) => {
+    e && e.preventDefault()
+    if (!chatInput || !socketRef.current || !socketRef.current.connected) return
+    const payload = { roomId, from: 'Me', message: chatInput }
+    socketRef.current.emit('chat', payload)
+    setChatInput('')
+  }
+
+  // auto-scroll chat when messages change
+  useEffect(() => {
+    if (messagesRef.current) {
+      messagesRef.current.scrollTop = messagesRef.current.scrollHeight
+    }
+  }, [chatMessages])
 
   // custom pieces using public/image assets
   const customPieces = {
-    // increase size slightly to 78% for a bit larger appearance, center with computed margins
     wK: ({ squareWidth }) => {
       const size = Math.floor(squareWidth * 0.78)
       const margin = Math.floor((squareWidth - size) / 2)
@@ -179,18 +178,9 @@ export default function ChessBoardComponent() {
     },
   }
 
-  // send chat message
-  const sendChat = (e) => {
-    e && e.preventDefault()
-    if (!chatInput || !socketRef.current || !socketRef.current.connected) return
-    const payload = { roomId, from: 'Me', message: chatInput }
-    socketRef.current.emit('chat', payload)
-    setChatInput('')
-  }
-
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', gap: 20 }}>
-      <div style={{ width: 480, textAlign: 'center' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', paddingBottom: CHAT_HEIGHT }}>
+      <div style={{ width: 520, marginTop: 24 }}>
         <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center', gap: 12, alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 12, height: 12, borderRadius: 12, background: '#fff', border: currentTurn === 'w' ? '3px solid #4CAF50' : '1px solid #888' }} />
@@ -211,7 +201,6 @@ export default function ChessBoardComponent() {
           customLightSquareStyle={{ backgroundColor: '#fbfbfb' }}
           customDarkSquareStyle={{ backgroundColor: '#2f2f2f' }}
           onSquareClick={(sq) => {
-            // If a square is already selected and user tapped a destination, attempt move
             if (selectedSquare && selectedSquare !== sq) {
               const moveObj = legalMoves.find(m => m.to === sq)
               if (moveObj) {
@@ -225,36 +214,28 @@ export default function ChessBoardComponent() {
                 return
               }
             }
-
-            // toggle selection
             if (selectedSquare === sq) {
               setSelectedSquare(null)
               setLegalMoves([])
               return
             }
-
-            // select this square and compute verbose legal moves
             setSelectedSquare(sq)
             const moves = chessRef.current.moves({ square: sq, verbose: true }) || []
             setLegalMoves(moves)
           }}
-          boardWidth={480}
+          boardWidth={520}
           customSquareStyles={(() => {
             const styles = {}
-            // last move highlight (orange)
             if (lastMove) {
               styles[lastMove.from] = { boxShadow: 'inset 0 0 6px 3px rgba(255,149,0,0.6)', borderRadius: '6px' }
               styles[lastMove.to] = { boxShadow: 'inset 0 0 6px 3px rgba(255,149,0,0.9)', borderRadius: '6px' }
             }
-
-            // selected origin + legal moves indicators
             if (selectedSquare && legalMoves.length > 0) {
               styles[selectedSquare] = { boxShadow: 'inset 0 0 0 3px rgba(0,122,255,0.6)', borderRadius: '6px' }
               legalMoves.forEach(m => {
                 const to = m.to
                 if (!to) return
                 if (m.captured) {
-                  // capture: orange tint + small orange dot
                   styles[to] = {
                     ...styles[to],
                     backgroundColor: 'rgba(255,149,0,0.12)',
@@ -266,10 +247,8 @@ export default function ChessBoardComponent() {
                     backgroundSize: '18% 18%'
                   }
                 } else {
-                  // quiet move: small blue dot
                   styles[to] = {
                     ...styles[to],
-                    /* Apple-style soft dot: subtle white highlight center, strong blue core, soft fade and glow */
                     backgroundImage: 'radial-gradient(circle at 50% 42%, rgba(255,255,255,0.95) 0%, rgba(0,122,255,0.98) 42%, rgba(0,122,255,0.7) 56%, rgba(0,122,255,0.0) 72%)',
                     backgroundRepeat: 'no-repeat',
                     backgroundPosition: '50% 42%',
@@ -285,7 +264,7 @@ export default function ChessBoardComponent() {
         />
       </div>
 
-      {/* Promotion modal (modal overlays the whole screen) */}
+      {/* Promotion modal */}
       {promotion && (
         <div
           role="dialog"
@@ -306,7 +285,6 @@ export default function ChessBoardComponent() {
             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
               {['q', 'r', 'b', 'n'].map((p) => {
                 const colorPrefix = promotion && promotion.color === 'b' ? 'b' : 'w'
-                // map promotion letter to image file names: e.g. wQ.png, bN.png
                 const fileMap = { q: 'Q', r: 'R', b: 'B', n: 'N' }
                 const imgName = `${colorPrefix}${fileMap[p]}.png`
                 return (
@@ -340,10 +318,10 @@ export default function ChessBoardComponent() {
         </div>
       )}
 
-      {/* Chat panel */}
-      <div style={{ width: 300, maxHeight: 560, display: 'flex', flexDirection: 'column', background: '#fff', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.06)', padding: 12 }}>
+      {/* Fixed chat at bottom */}
+      <div className="chat-fixed" style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: CHAT_HEIGHT, background: '#ffffff', boxShadow: '0 -8px 24px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', padding: 12 }}>
         <div style={{ fontWeight: 600, marginBottom: 8 }}>Room chat</div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '6px 4px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div ref={messagesRef} style={{ flex: 1, overflowY: 'auto', padding: '6px 4px', display: 'flex', flexDirection: 'column', gap: 8 }}>
           {chatMessages.length === 0 && <div style={{ color: '#888', fontSize: 13 }}>No messages yet</div>}
           {chatMessages.map((m, i) => (
             <div key={i} style={{ alignSelf: m.from === 'Me' ? 'flex-end' : 'flex-start', maxWidth: '85%' }}>
