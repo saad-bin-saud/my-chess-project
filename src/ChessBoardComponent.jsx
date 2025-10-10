@@ -268,9 +268,9 @@ export default function ChessBoardComponent() {
         />
       </div>
       {promotion && (
-        <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: 'rgba(0,0,0,0.6)', padding: 20, borderRadius: 8 }}>
-            <div style={{ color: '#fff', marginBottom: 8 }}>Choose promotion:</div>
+        <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.35)' }}>
+          <div style={{ background: '#ffffff', padding: 20, borderRadius: 12, boxShadow: '0 12px 30px rgba(0,0,0,0.18)' }}>
+            <div style={{ color: '#111', marginBottom: 8, fontWeight: 600 }}>Choose promotion</div>
             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
               {['q', 'r', 'b', 'n'].map((p) => {
                 const colorPrefix = promotion && promotion.color === 'b' ? 'b' : 'w'
@@ -293,7 +293,7 @@ export default function ChessBoardComponent() {
                       cursor: 'pointer'
                     }}
                   >
-                    <img src={`/image/${imgName}`} alt={fileMap[p]} style={{ width: 48, height: 48, objectFit: 'contain', display: 'block' }} />
+                    <img src={`/image/${imgName}`} alt={fileMap[p]} style={{ width: 56, height: 56, objectFit: 'contain', display: 'block', background: 'transparent' }} />
                   </button>
                 )
               })}
