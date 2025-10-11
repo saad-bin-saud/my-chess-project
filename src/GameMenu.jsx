@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { motion } from "framer-motion"
 
 // Apple-style mobile menu component
@@ -6,27 +6,40 @@ import { motion } from "framer-motion"
 // - Uses system font stack to mimic Apple SF UI
 // - Gentle shadows, large rounded cards, lots of white space
 
-export default function AppleStyleGameMenu() {
+export default function AppleStyleGameMenu({ onStart }) {
+  const [selected, setSelected] = useState(null)
+
+  function handleStart() {
+    if (!selected) {
+      // simple UX hint
+      alert('Please choose a match type first')
+      return
+    }
+    console.log('[menu] starting match type:', selected)
+    if (typeof onStart === 'function') onStart(selected)
+  }
+
   return (
     <div className="apple-menu-root">
       <div className="apple-menu-container">
         {/* Large Start Button */}
-  <motion.button
+        <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
-          className="apple-start-btn"
+          className={"apple-start-btn " + (selected ? '' : 'disabled')}
           aria-label="Start Game"
+          onClick={handleStart}
         >
           Start Game
         </motion.button>
 
         {/* Menu list */}
         <div className="apple-menu-list">
-          <MenuRow icon="🏅" label="Tournaments" />
-          <MenuRow icon="🤝" label="Anonymous Talk" />
-          <MenuRow icon="🤖" label="Ranking Match" />
-          <MenuRow icon="👩‍🦰" label="Earn BNS" />
+          <MenuRow icon="🏅" label="Tournaments" selected={selected === 'Tournaments'} onClick={() => setSelected('Tournaments')} />
+          <MenuRow icon="🤝" label="Anonymous Talk" selected={selected === 'Anonymous Talk'} onClick={() => setSelected('Anonymous Talk')} />
+          <MenuRow icon="🤖" label="Ranking Match" selected={selected === 'Ranking Match'} onClick={() => setSelected('Ranking Match')} />
+          <MenuRow icon="₿" label="Earn BNS" selected={selected === 'Earn BNS'} onClick={() => setSelected('Earn BNS')} />
         </div>
 
         {/* More button */}
@@ -51,9 +64,14 @@ export default function AppleStyleGameMenu() {
   )
 }
 
-function MenuRow({ icon, label }) {
+function MenuRow({ icon, label, selected = false, onClick }) {
   return (
-    <motion.button whileTap={{ scale: 0.995 }} className="apple-menu-row" aria-label={label}>
+    <motion.button
+      whileTap={{ scale: 0.995 }}
+      className={"apple-menu-row" + (selected ? ' selected' : '')}
+      aria-label={label}
+      onClick={onClick}
+    >
       <div className="apple-menu-row-icon" aria-hidden>{icon}</div>
       <div className="apple-menu-row-label">{label}</div>
     </motion.button>
