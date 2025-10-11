@@ -11,45 +11,13 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 3000;
 
-// Simple in-memory games map: roomId -> { game }
-const games = new Map();
+const { createGameEngine } = require('./gameEngine')
 
-io.on('connection', (socket) => {
-  console.log('socket connected', socket.id);
+// initialize engine
+const engine = createGameEngine(io)
 
-  socket.on('join', (roomId) => {
-    socket.join(roomId);
-    if (!games.has(roomId)) {
-      games.set(roomId, { game: new Chess() });
-    }
-    const state = games.get(roomId).game.fen();
-    socket.emit('state', { fen: state });
-  });
-
-  socket.on('move', ({ roomId, from, to, promotion }) => {
-    const entry = games.get(roomId);
-    if (!entry) return socket.emit('error', 'no such room');
-    const game = entry.game;
-    const move = game.move({ from, to, promotion: promotion || 'q' });
-    if (move === null) {
-      socket.emit('move_result', { ok: false });
-    } else {
-      // broadcast new position to room
-      io.to(roomId).emit('move_result', { ok: true, move, fen: game.fen() });
-    }
-  });
-
-  // Simple chat messages within a room
-  socket.on('chat', ({ roomId, from, message }) => {
-    if (!roomId || !message) return
-    const payload = { from: from || socket.id, message, ts: Date.now() }
-    io.to(roomId).emit('chat', payload)
-  })
-
-  socket.on('disconnect', () => {
-    console.log('socket disconnected', socket.id);
-  });
-});
+// expose internal state for debugging (optional)
+io.engineState = { games: engine.games, queue: engine.matchQueue }
 
 app.get('/', (req, res) => res.send('Socket.IO chess server'));
 

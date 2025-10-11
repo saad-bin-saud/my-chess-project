@@ -8,6 +8,13 @@ import { motion } from "framer-motion"
 
 export default function AppleStyleGameMenu({ onStart }) {
   const [selected, setSelected] = useState(null)
+  const [queued, setQueued] = useState(false)
+
+  function handleCancelQueue() {
+    setQueued(false)
+    // notify parent if needed via onStart with null? we'll keep local cancel for now
+    if (window && window.socket) window.socket.emit && window.socket.emit('cancel_find')
+  }
 
   function handleStart() {
     if (!selected) {
@@ -16,6 +23,7 @@ export default function AppleStyleGameMenu({ onStart }) {
       return
     }
     console.log('[menu] starting match type:', selected)
+    setQueued(true)
     if (typeof onStart === 'function') onStart(selected)
   }
 
@@ -44,20 +52,24 @@ export default function AppleStyleGameMenu({ onStart }) {
 
         {/* More button */}
         <div className="apple-more-wrap">
-          <button className="apple-more-btn" aria-label="More">
-            More
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-5 h-5"
-              aria-hidden
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
+          {queued ? (
+            <button className="apple-more-btn" onClick={handleCancelQueue} aria-label="Cancel">Cancel</button>
+          ) : (
+            <button className="apple-more-btn" aria-label="More">
+              More
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-5 h-5"
+                aria-hidden
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
     </div>

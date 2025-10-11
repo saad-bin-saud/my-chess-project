@@ -22,10 +22,10 @@ function arrowDataURL(angleDeg, color = 'rgba(0,122,255,0.6)') {
   return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`
 }
 
-export default function ChessBoardComponent() {
-  const socketRef = useRef(null)
+export default function ChessBoardComponent({ socket = null, roomId: propRoomId = null, myColor = null }) {
+  const socketRef = useRef(socket)
   const [fen, setFen] = useState('start')
-  const [roomId] = useState('room1')
+  const [roomId] = useState(() => propRoomId || 'room1')
   const chessRef = useRef(new Chess())
   const [promotion, setPromotion] = useState(null)
   const [lastMove, setLastMove] = useState(null)
@@ -53,9 +53,12 @@ export default function ChessBoardComponent() {
   }, [])
 
   useEffect(() => {
-    socketRef.current = io('http://localhost:3000')
+    if (!socketRef.current) {
+      socketRef.current = io('http://localhost:3000')
+    }
     socketRef.current.on('connect', () => console.log('connected to server'))
-    socketRef.current.emit('join', roomId)
+    // join the room provided
+    if (roomId) socketRef.current.emit('join', roomId)
     socketRef.current.on('state', (data) => {
       if (data && data.fen) {
         chessRef.current.load(data.fen)
@@ -75,8 +78,16 @@ export default function ChessBoardComponent() {
     socketRef.current.on('chat', (msg) => {
       setChatMessages((s) => [...s, msg])
     })
-
-    return () => socketRef.current.disconnect()
+    return () => {
+      // only disconnect if we created the socket here
+      if (!socket) socketRef.current && socketRef.current.disconnect()
+      // otherwise remove listeners
+      if (socket) {
+        socketRef.current.off('state')
+        socketRef.current.off('move_result')
+        socketRef.current.off('chat')
+      }
+    }
   }, [roomId])
 
   // Called when a piece is dropped on a square (drag or click-to-move)
